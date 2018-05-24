@@ -42,6 +42,12 @@ public class CartFragment extends Fragment {
             }
         });
 
+        rootView.findViewById(R.id.buttonSave).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+
         return rootView;
     }
 

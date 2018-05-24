@@ -1,6 +1,8 @@
 package com.collegelasalle.felix.androidstorageexample;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -54,14 +56,8 @@ public class CartFragment extends Fragment {
         rootView.findViewById(R.id.buttonSave).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                File file = new File(getContext().getFilesDir(), FILENAME);
-                try {
-                    DataOutputStream dataOut = new DataOutputStream(new FileOutputStream(file));
-                    dataOut.writeInt(count);
-                    dataOut.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                sharedPref.edit().putInt("count", count).commit();
             }
         });
         return rootView;
@@ -70,17 +66,9 @@ public class CartFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        File file = new File(getContext().getFilesDir(), FILENAME);
-        if (file.exists()) {
-            try {
-                DataInputStream dataIn = new DataInputStream(new FileInputStream(file));
-                count = dataIn.readInt();
-                dataIn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            UpdateCount(count);
-        }
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        count = sharedPref.getInt("count", 0);
+        UpdateCount(count);
     }
 
     void UpdateCount(int n) {

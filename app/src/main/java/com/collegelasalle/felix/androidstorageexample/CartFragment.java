@@ -1,9 +1,6 @@
 package com.collegelasalle.felix.androidstorageexample;
 
-
 import android.arch.persistence.room.Room;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,25 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.List;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class CartFragment extends Fragment {
 
-    private int count;
-    private final String FILENAME = "420NA6AS";
+    private Product product1 = new Product(0,"Product1",0);
+    private Product product2 = new Product(1,"Product2",0);
     private AppDatabase db;
 
     public CartFragment() {
@@ -45,22 +32,43 @@ public class CartFragment extends Fragment {
         rootView.findViewById(R.id.buttonMinus).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                UpdateCount(count - 1);
+                product1.count--;
+                UpdateCount1();
             }
         });
 
         rootView.findViewById(R.id.buttonPlus).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                UpdateCount(count + 1);
+                product1.count++;
+                UpdateCount1();
+            }
+        });
+
+        rootView.findViewById(R.id.buttonMinus2).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                product2.count--;
+                UpdateCount2();
+            }
+        });
+
+        rootView.findViewById(R.id.buttonPlus2).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                product2.count++;
+                UpdateCount2();
             }
         });
 
         rootView.findViewById(R.id.buttonSave).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Product product = new Product(0,"productName", count);
-                db.productDao().insertAll(product);
+                EditText editText = getView().findViewById(R.id.editText);
+                product1.productName = editText.getText().toString();
+                editText = getView().findViewById(R.id.editText2);
+                product2.productName = editText.getText().toString();
+                db.productDao().insertAll(product1, product2);
             }
         });
         return rootView;
@@ -73,14 +81,33 @@ public class CartFragment extends Fragment {
         List<Product> products = db.productDao().getAll();
         if (products.size() > 0)
         {
-            count = products.get(0).count;
+            for (Product product : products) {
+                if (product.uid == 0) {
+                    product1 = product;
+                } else {
+                    product2 = product;
+                }
+            }
         }
-        UpdateCount(count);
+        UpdateCount1();
+        UpdateCount2();
+        UpdateNames();
     }
 
-    void UpdateCount(int n) {
-        count = n;
+    void UpdateCount1() {
         TextView textView = getView().findViewById(R.id.textView);
-        textView.setText(Integer.toString(count));
+        textView.setText(Integer.toString(product1.count));
+    }
+
+    void UpdateCount2() {
+        TextView textView = getView().findViewById(R.id.textView2);
+        textView.setText(Integer.toString(product2.count));
+    }
+
+    void UpdateNames() {
+        EditText editText = getView().findViewById(R.id.editText);
+        editText.setText(product1.productName);
+        editText = getView().findViewById(R.id.editText2);
+        editText.setText(product2.productName);
     }
 }
